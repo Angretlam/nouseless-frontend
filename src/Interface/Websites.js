@@ -5,7 +5,7 @@ class WebsitesTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = { websites: [] }
-        this.handleChange = this.handleChange.bind(this);
+        this.updateTable = this.updateTable.bind(this);
     }
 
     componentDidMount() {
@@ -19,7 +19,7 @@ class WebsitesTable extends React.Component {
         }
     }
 
-    handleChange(event) {
+    updateTable(event) {
         let raw_info = event.target.id;
         let info_array = raw_info.split("_");
         let siteNdx = info_array[0];
@@ -109,7 +109,7 @@ class WebsitesTable extends React.Component {
                                                                         type="checkbox"
                                                                         id={ndx + "_" + day + "_" + subndx}
                                                                         checked={val ? "checked" : ""}
-                                                                        onChange={this.handleChange} 
+                                                                        onChange={this.updateTable} 
                                                                     />
                                                                 </td>
                                                             </>
