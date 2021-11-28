@@ -49,7 +49,7 @@ class WebsitesTable extends React.Component {
                 <>
                     <h1>Block List</h1>
 
-                    <Table className="table table-striped">
+                    <Table className="table table-striped table-bordered">
                         <thead style={{
                             position: "sticky",
                             top: 0,
