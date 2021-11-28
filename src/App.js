@@ -1,7 +1,7 @@
 import './App.css';
 import UselessHeader from './Framing/Header.js';
 import UselessFooter from './Framing/Footer.js';
-import WebSites from './Interface/Websites.js';
+import WebsitesTable from './Interface/Websites.js';
 import { Container } from 'react-bootstrap';
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
     <>
       <UselessHeader />
       <Container>
-        <WebSites />
+        <WebsitesTable />
       </Container>
       <UselessFooter />
     </>
