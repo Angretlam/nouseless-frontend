@@ -4,8 +4,11 @@ import { Table } from 'react-bootstrap';
 class WebsitesTable extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { websites: [] }
+        this.state = { websites: []}
         this.updateTable = this.updateTable.bind(this);
+        this.insertSite = this.insertSite.bind(this);
+        this.deleteSite = this.deleteSite.bind(this);
+        this.validateSite = this.validateSite.bind(this);
     }
 
     componentDidMount() {
@@ -15,8 +18,54 @@ class WebsitesTable extends React.Component {
                 .then(data => data.text())
                 .then(json => this.setState(JSON.parse(json)))
         } else {
-            3("Fail");
+            console.log("Fail");
         }
+    }
+
+    insertSite() {
+        let siteEntry = document.getElementById('newSiteForm');
+        let newUrl = siteEntry.value;
+        let newEntry = {
+            "url": newUrl,
+            "days":
+            {
+                "MONDAY": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                "TUESDAY": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                "WEDNESDAY": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                "THURSDAY": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                "FRIDAY": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                "SATURDAY": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                "SUNDAY": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            }
+        }
+        let oldSites = this.state.websites;
+        oldSites.push(newEntry);
+        this.setState(newEntry);
+
+    }
+
+    validateSite(event) {
+        let siteValue = event.target.value;
+        let siteRegex = /.*\....?/;
+        let addSiteBtn = document.getElementById('add_site_btn');
+        if (
+            siteRegex.test(siteValue) && 
+            (this.state.websites.map(site => {return site.url;}).indexOf(siteValue)) === -1 
+            ) {
+
+            addSiteBtn.disabled = false;
+        } else {
+            addSiteBtn.disabled = true;
+        }
+    }
+
+    deleteSite(event) {
+        let raw_info = event.target.id;
+        let info_array = raw_info.split("_");
+        let siteNdx = info_array[0];
+        let newSites = this.state.websites.splice(siteNdx, 1);
+
+        this.setState(newSites);
     }
 
     updateTable(event) {
@@ -31,7 +80,7 @@ class WebsitesTable extends React.Component {
         // But if we use that here, then 1, 0, true, and false all appear in the data
         oldSites[siteNdx].days[dayName][hourNdx] = (
             oldSites[siteNdx].days[dayName][hourNdx] ?
-            0 : 1
+                0 : 1
         );
 
         this.setState(oldSites);
@@ -49,7 +98,7 @@ class WebsitesTable extends React.Component {
                 <>
                     <h1>Block List</h1>
 
-                    <Table className="table table-striped table-bordered">
+                    <Table className="table table-striped table-bordered table-light">
                         <thead style={{
                             position: "sticky",
                             top: 0,
@@ -90,7 +139,7 @@ class WebsitesTable extends React.Component {
                                     <>
                                         <tr key={ndx + "_header"}>
                                             <td colSpan="23" key={ndx + "_url_col"}>{site.url}</td>
-                                            <td colSpan="3" key={ndx + "_del_col"}><button className="btn btn-danger">Delete</button></td>
+                                            <td colSpan="3" key={ndx + "_del_col"}><button className="btn btn-danger" id={ndx + "_site"} onClick={this.deleteSite} >Delete</button></td>
                                         </tr>
 
                                         {Object.keys(site.days).map((day) => {
@@ -109,7 +158,7 @@ class WebsitesTable extends React.Component {
                                                                         type="checkbox"
                                                                         id={ndx + "_" + day + "_" + subndx}
                                                                         checked={val ? "checked" : ""}
-                                                                        onChange={this.updateTable} 
+                                                                        onChange={this.updateTable}
                                                                     />
                                                                 </td>
                                                             </>
@@ -126,6 +175,22 @@ class WebsitesTable extends React.Component {
                             }
                         </tbody>
                     </Table>
+                    <hr />
+                    <br />
+                    <br />
+                    <div style={{
+                        width: "100%",
+                        position: "fixed",
+                        bottom: 0,
+                        padding: "1em",
+                        backgroundColor: "rgba(255, 255, 255, .5)"
+                    }}>
+                        <div className="mx-auto">
+                            <input className="form-control " type="text" id="newSiteForm" onChange={this.validateSite} style={{width: "300px", display: "inline-block", marginRight: "1em"}} />
+                            <button id="add_site_btn" style={{ marginRight: "1em" }} className="btn btn-primary" onClick={this.insertSite}>Add Site</button>
+                            <button className="btn btn-success">Save!</button>
+                        </div>
+                    </div>
                 </>
             )
         }
