@@ -9,17 +9,32 @@ class WebsitesTable extends React.Component {
         this.insertSite = this.insertSite.bind(this);
         this.deleteSite = this.deleteSite.bind(this);
         this.validateSite = this.validateSite.bind(this);
+        this.saveSites = this.saveSites.bind(this);
     }
 
     componentDidMount() {
         if (this.state.websites.length === 0) {
-            let blockListUrl = 'https://raw.githubusercontent.com/Angretlam/focus_time/main/blocks.json';
+            let blockListUrl = 'https://8a85v0qev8.execute-api.us-east-2.amazonaws.com/Production/blocklist'
             fetch(blockListUrl)
-                .then(data => data.text())
-                .then(json => this.setState(JSON.parse(json)))
+                .then(data => data.json())
+                .then(info => this.setState(info))
         } else {
             console.log("Fail");
         }
+    }
+
+    saveSites() {
+        fetch('https://8a85v0qev8.execute-api.us-east-2.amazonaws.com/Production/blocklist', {
+            method: 'PATCH',
+            body: JSON.stringify(this.state.websites),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+            })
+            .then(response => response.json())
+            .then(json => console.log(json))
+            .finally(alert('Save successful!'))
+
     }
 
     insertSite() {
@@ -91,6 +106,22 @@ class WebsitesTable extends React.Component {
             return (
                 <>
                     <h1>Loading Blocklist...</h1>
+                    <hr />
+                    <br />
+                    <br />
+                    <div style={{
+                        width: "100%",
+                        position: "fixed",
+                        bottom: 0,
+                        padding: "1em",
+                        backgroundColor: "rgba(255, 255, 255, .5)"
+                    }}>
+                        <div className="mx-auto">
+                            <input className="form-control " type="text" id="newSiteForm" onChange={this.validateSite} style={{width: "300px", display: "inline-block", marginRight: "1em"}} />
+                            <button id="add_site_btn" style={{ marginRight: "1em" }} className="btn btn-primary" onClick={this.insertSite}>Add Site</button>
+                            <button className="btn btn-success" onClick={this.saveSites}>Save!</button>
+                        </div>
+                    </div>
                 </>
             );
         } else {
@@ -188,7 +219,7 @@ class WebsitesTable extends React.Component {
                         <div className="mx-auto">
                             <input className="form-control " type="text" id="newSiteForm" onChange={this.validateSite} style={{width: "300px", display: "inline-block", marginRight: "1em"}} />
                             <button id="add_site_btn" style={{ marginRight: "1em" }} className="btn btn-primary" onClick={this.insertSite}>Add Site</button>
-                            <button className="btn btn-success">Save!</button>
+                            <button className="btn btn-success" onClick={this.saveSites}>Save!</button>
                         </div>
                     </div>
                 </>
