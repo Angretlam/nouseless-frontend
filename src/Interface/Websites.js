@@ -10,6 +10,10 @@ class WebsitesTable extends React.Component {
         this.deleteSite = this.deleteSite.bind(this);
         this.validateSite = this.validateSite.bind(this);
         this.saveSites = this.saveSites.bind(this);
+        this.toggleDetails = this.toggleDetails.bind(this);
+        this.checkAll = this.checkAll.bind(this);
+        this.clearAll = this.clearAll.bind(this);
+        this.days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
     }
 
     componentDidMount() {
@@ -21,6 +25,55 @@ class WebsitesTable extends React.Component {
         } else {
             console.log("Fail");
         }
+    }
+
+    toggleDetails(event) {
+        console.log(event);
+        let targetId = event.target.parentNode.id;
+        let targetArray = targetId.split('_');
+        let index = targetArray[0];
+
+        this.days.map(day => {
+            let dayRow = document.getElementById(index + '_' + day);            
+            dayRow.style.display = ( dayRow.style.display === '' ? 'none' : '');
+            return true;
+        })
+    }
+
+    checkAll(event) {
+        event.stopPropagation();
+        let raw_info = event.target.id;
+        let info_array = raw_info.split("_");
+        let siteNdx = info_array[0];
+        let newSites = this.state.websites;
+
+        this.days.map(day => {
+            newSites[siteNdx].days[day].map((hour, ndx) => {
+                newSites[siteNdx].days[day][ndx] = 1;                
+                return true;
+            })
+            return true;
+        })
+
+        this.setState(newSites);
+    }
+
+    clearAll(event) {
+        event.stopPropagation();
+        let raw_info = event.target.id;
+        let info_array = raw_info.split("_");
+        let siteNdx = info_array[0];
+        let newSites = this.state.websites;
+
+        this.days.map(day => {
+            newSites[siteNdx].days[day].map((hour, ndx) => {
+                newSites[siteNdx].days[day][ndx] = 0;                
+                return true;
+            })
+            return true;
+        })
+
+        this.setState(newSites);
     }
 
     saveSites() {
@@ -129,7 +182,7 @@ class WebsitesTable extends React.Component {
                 <>
                     <h1>Block List</h1>
 
-                    <Table className="table table-striped table-bordered table-light">
+                    <Table className="table table-striped table-bordered table-light table-hover">
                         <thead style={{
                             position: "sticky",
                             top: 0,
@@ -168,14 +221,16 @@ class WebsitesTable extends React.Component {
                             {this.state.websites.map((site, ndx) => {
                                 return (
                                     <>
-                                        <tr key={ndx + "_header"}>
-                                            <td colSpan="23" key={ndx + "_url_col"}>{site.url}</td>
-                                            <td colSpan="3" key={ndx + "_del_col"}><button className="btn btn-danger" id={ndx + "_site"} onClick={this.deleteSite} >Delete</button></td>
+                                        <tr key={ndx + "_header"} id={ndx + "_header"} onClick={this.toggleDetails}>
+                                            <td colSpan="17" key={ndx + "_url_col"}>{site.url}</td>
+                                            <td colSpan="3" key={ndx + "_checkAll_col"}><button key={ndx + "_checkAll_btn"} className="btn btn-warning" id={ndx + "_site_checkAll"} onClick={this.checkAll} >Check All</button></td>
+                                            <td colSpan="3" key={ndx + "_clearAll_col"}><button key={ndx + "_clearAll_btn"} className="btn btn-warning" id={ndx + "_site_clearAll"} onClick={this.clearAll} >Clear All</button></td>
+                                            <td colSpan="3" key={ndx + "_delete_col"}><button key={ndx + "_delete_btn"} className="btn btn-danger" id={ndx + "_site_deleteSite"} onClick={this.deleteSite} >Delete</button></td>
                                         </tr>
 
-                                        {Object.keys(site.days).map((day) => {
+                                        {['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'].map((day) => {
                                             return (
-                                                <tr key={ndx + "_" + day}>
+                                                <tr  key={ndx + "_" + day} id={ndx + "_" + day} style={{display: 'none'}}>
                                                     <td key={ndx + "_blank"}></td>
                                                     <td key={ndx + "_label"}>
                                                         {day}
@@ -185,6 +240,7 @@ class WebsitesTable extends React.Component {
                                                             <>
                                                                 <td key={ndx + "_" + day + "_" + subndx + "_td"}>
                                                                     <input
+                                                                        key={ndx + "_" + day + "_" + subndx + "_input"}
                                                                         className="form-check-input"
                                                                         type="checkbox"
                                                                         id={ndx + "_" + day + "_" + subndx}
