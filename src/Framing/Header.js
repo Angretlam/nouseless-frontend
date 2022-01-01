@@ -1,6 +1,17 @@
 import { Navbar, Container, Nav } from 'react-bootstrap';
+import { Auth } from 'aws-amplify';
 
 function UselessHeader() {
+
+  async function signOut() {
+    try {
+        await Auth.signOut();
+        window.location.reload();
+    } catch (error) {
+        console.log('error signing out: ', error);
+    }
+  }
+
   return (
     <>
         <link
@@ -13,6 +24,9 @@ function UselessHeader() {
             <Container>
             <Navbar.Brand href="#home">NoUseless.Tech</Navbar.Brand>
             <Nav className="me-auto">
+              <Nav.Item>
+                <Nav.Link onClick={signOut}>Sign Out</Nav.Link>
+              </Nav.Item>
             </Nav>
             </Container>
         </Navbar>
