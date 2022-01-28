@@ -13,6 +13,7 @@ class WebsitesTable extends React.Component {
         this.toggleDetails = this.toggleDetails.bind(this);
         this.checkAll = this.checkAll.bind(this);
         this.clearAll = this.clearAll.bind(this);
+        this.tempBlockSite = this.tempBlockSite.bind(this);
         this.days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
     }
 
@@ -38,6 +39,25 @@ class WebsitesTable extends React.Component {
             dayRow.style.display = ( dayRow.style.display === '' ? 'none' : '');
             return true;
         })
+    }
+
+    tempBlockSite(event) {
+        let raw_info = event.target.id;
+        let info_array = raw_info.split("_");
+        let siteNdx = info_array[0];
+        let targetUrl = this.state.websites[siteNdx].url;
+        let apiUrl = 'https://8a85v0qev8.execute-api.us-east-2.amazonaws.com/Production/blocksite'
+        fetch(apiUrl, {
+            method: 'POST',
+            body: JSON.stringify({"targetSite": targetUrl}),
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            }
+        })
+        .then(response => response.json())
+        .then(json => console.log(json))
+        .finally(alert('Site blocked.'))
+
     }
 
     checkAll(event) {
@@ -222,7 +242,8 @@ class WebsitesTable extends React.Component {
                                 return (
                                     <>
                                         <tr key={ndx + "_header"} id={ndx + "_header"} onClick={this.toggleDetails}>
-                                            <td colSpan="17" key={ndx + "_url_col"}>{site.url}</td>
+                                            <td colSpan="14" key={ndx + "_url_col"}>{site.url}</td>
+                                            <td colSpan="3" key={ndx + "_blockNow_col"}><button key={ndx + "_blockNow_btn"} className="btn btn-warning" id={ndx + "_site_blockNow"} onClick={this.tempBlockSite} >Block Now</button></td>
                                             <td colSpan="3" key={ndx + "_checkAll_col"}><button key={ndx + "_checkAll_btn"} className="btn btn-warning" id={ndx + "_site_checkAll"} onClick={this.checkAll} >Check All</button></td>
                                             <td colSpan="3" key={ndx + "_clearAll_col"}><button key={ndx + "_clearAll_btn"} className="btn btn-warning" id={ndx + "_site_clearAll"} onClick={this.clearAll} >Clear All</button></td>
                                             <td colSpan="3" key={ndx + "_delete_col"}><button key={ndx + "_delete_btn"} className="btn btn-danger" id={ndx + "_site_deleteSite"} onClick={this.deleteSite} >Delete</button></td>
